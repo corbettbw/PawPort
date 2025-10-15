@@ -1,0 +1,21 @@
+<% flashes = local_assigns.fetch(:flashes, flash) %>
+<% if flashes.any? %>
+  <div class="fixed top-16 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4"
+       data-controller="flash"
+       data-flash-timeout-value="4000">
+    <% flashes.each do |type, message| %>
+      <div class="mb-3 rounded-md px-4 py-3 shadow-sm text-center font-medium animate-fade-in <%= flash_class(type) %>"
+           data-flash-target="item"
+           role="status" aria-live="polite">
+        <div class="flex items-center justify-center gap-3">
+          <span><%= message %></span>
+          <button type="button"
+                  data-action="flash#close"
+                  class="ml-2 text-sm underline underline-offset-2 hover:opacity-80 cursor-pointer">
+            dismiss
+          </button>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

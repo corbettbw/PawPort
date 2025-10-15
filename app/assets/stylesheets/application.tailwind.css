@@ -1,1 +1,35 @@
 @import "tailwindcss";
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors;
+  }
+
+  /* remove @apply btn ... ; inline the same utilities */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors
+           bg-rose-600 text-white hover:bg-rose-700;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors
+           bg-gray-200 text-gray-800 hover:bg-gray-300;
+  }
+}
+
+@layer base {
+  input[type="email"],
+  input[type="password"],
+  input[type="text"],
+  select,
+  textarea {
+    @apply block w-full rounded-lg border border-gray-300 px-3 py-2
+           focus:outline-none focus:ring-2 focus:ring-rose-500;
+  }
+  label { @apply block text-sm font-medium text-gray-700; }
+}
+
+/* animation helper */
+@layer utilities {
+  @keyframes fade-in { from { opacity:0; transform:translateY(-5px) } to { opacity:1; transform:none } }
+  .animate-fade-in { animation: fade-in .25s ease-out }
+}

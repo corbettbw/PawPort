@@ -1,39 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Paw Port" %></title>
+    <title>PawPort</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body>
-    <header class="p-4 flex justify-end gap-4 bg-gray-100">
+  <body class="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <header class="p-4 flex justify-between items-center bg-white shadow-sm">
+      <%= render "shared/flash" %>
+      <h1 class="text-xl font-bold text-rose-600">🐾 PawPort</h1>
 
       <% if user_signed_in? %>
-        <%= link_to "Sign out", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-red-600" %>
+        <%= link_to "Sign out", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-sm font-medium text-red-600 hover:text-red-800" %>
       <% else %>
-        <%= link_to "Sign in", new_user_session_path, class: "text-blue-600" %> |
-        <%= link_to "Sign up", new_user_registration_path, class: "text-blue-600" %>
+        <div class="space-x-3">
+          <%= link_to "Sign in", new_user_session_path, class: "text-sm font-medium text-blue-600 hover:text-blue-800" %>
+          <%= link_to "Sign up", new_user_registration_path, class: "text-sm font-medium text-blue-600 hover:text-blue-800" %>
+        </div>
       <% end %>
-
     </header>
-    
-    <%= yield %>
+
+    <main class="max-w-5xl mx-auto py-10 px-4">
+      <%= yield %>
+    </main>
   </body>
 </html>
