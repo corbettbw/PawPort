@@ -1,6 +1,9 @@
 {
-  "name": "app",
+  "name": "pawport",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.18",
@@ -11,6 +14,5 @@
     "build": "esbuild app/javascript/application.js --bundle --sourcemap --format=esm --outdir=app/assets/builds",
     "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css",
     "heroku-postbuild": "yarn build && yarn build:css"
-
   }
 }
