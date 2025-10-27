@@ -1,5 +1,6 @@
+# config/routes.rb
 Rails.application.routes.draw do
-  get "home/index"
   devise_for :users
+  resources :shelters
   root "home#index"
 end
