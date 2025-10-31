@@ -2,7 +2,10 @@
 <div class="max-w-3xl mx-auto p-6">
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-semibold">Your shelters</h1>
-    <%= link_to "New shelter", new_shelter_path, class: "btn btn-primary" %>
+    <div class="flex gap-3">
+      <%= link_to "New shelter", new_shelter_path, class: "btn btn-primary" %>
+      <%= link_to "Find shelter to join", browse_shelters_path, class: "btn btn-secondary" %>
+    </div>
   </div>
 
   <% if @shelters.any? %>

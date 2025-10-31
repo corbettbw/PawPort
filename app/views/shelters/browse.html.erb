@@ -1,0 +1,36 @@
+<!-- app/views/shelters/browse.html.erb -->
+<div class="max-w-3xl mx-auto p-6">
+  <h1 class="text-2xl font-semibold mb-4">Find a shelter</h1>
+
+  <%= form_with url: browse_shelters_path, method: :get, local: true, class: "mb-6 flex gap-2" do %>
+    <%= text_field_tag :q, @q, placeholder: "Search by name, address, or email", class: "w-full border rounded px-3 py-2" %>
+    <%= submit_tag "Search", class: "btn btn-primary" %>
+  <% end %>
+
+  <% if @shelters.any? %>
+    <ul class="divide-y">
+      <% @shelters.each do |shelter| %>
+        <li class="py-3 flex items-center justify-between">
+          <div>
+            <div class="font-medium"><%= shelter.name %></div>
+            <div class="text-sm text-gray-600"><%= shelter.address %></div>
+          </div>
+
+          <% if @joined_ids.include?(shelter.id) %>
+            <span class="text-sm text-gray-500">Already a member</span>
+          <% else %>
+            <%= button_to "Join", join_shelter_path(shelter, q: @q),
+                          method: :post,
+                          class: "btn btn-primary" %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-gray-600">No shelters match that search.</p>
+  <% end %>
+
+  <div class="mt-6">
+    <%= link_to "Back to My Shelters", shelters_path, class: "text-blue-600 hover:underline" %>
+  </div>
+</div>
