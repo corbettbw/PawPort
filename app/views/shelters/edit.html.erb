@@ -1,0 +1,41 @@
+<!-- app/views/shelters/edit.html.erb -->
+<div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
+  <h1 class="text-2xl font-semibold mb-4">Edit Shelter</h1>
+
+  <%= form_with model: @shelter, class: "space-y-4" do |f| %>
+    <div>
+      <%= f.label :name %>
+      <%= f.text_field :name, class: "w-full rounded-md border-gray-300" %>
+    </div>
+
+    <div>
+      <%= f.label :address %>
+      <%= f.text_field :address, class: "w-full rounded-md border-gray-300" %>
+    </div>
+
+    <div>
+      <%= f.label :phone %>
+      <%= f.telephone_field :phone, class: "w-full rounded-md border-gray-300" %>
+    </div>
+
+    <div>
+      <%= f.label :contact_email, "Contact Email" %>
+      <%= f.email_field :contact_email, class: "w-full rounded-md border-gray-300" %>
+    </div>
+
+    <div>
+      <%= f.label :capacity %>
+      <%= f.number_field :capacity, class: "w-full rounded-md border-gray-300" %>
+    </div>
+
+    <div>
+      <%= f.label :vacancies %>
+      <%= f.number_field :vacancies, class: "w-full rounded-md border-gray-300" %>
+    </div>
+
+    <div class="pt-2 flex gap-3">
+      <%= f.submit "Save changes", class: "px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700" %>
+      <%= link_to "Cancel", @shelter, class: "px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300" %>
+    </div>
+  <% end %>
+</div>
