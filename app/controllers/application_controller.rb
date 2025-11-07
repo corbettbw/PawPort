@@ -5,11 +5,11 @@ class ApplicationController < ActionController::Base
   private
 
   def after_sign_in_path_for(resource)
-    shelters_path
+    root_path
   end
 
   # Devise calls this after registrations#create (new accounts)
   def after_sign_up_path_for(resource)
-    shelters_path
+    root_path
   end
 end
