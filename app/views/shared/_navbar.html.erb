@@ -1,0 +1,36 @@
+<nav class="bg-white border-b border-gray-200 shadow-sm">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    
+    <!-- Left: Logo -->
+    <%= link_to root_path, class: "flex items-center space-x-2 hover:opacity-90 transition" do %>
+      <span class="text-2xl">🐾</span>
+      <span class="text-xl font-bold text-rose-600">PawPort</span>
+    <% end %>
+
+    <!-- Right: Menu Links -->
+    <div class="flex items-center gap-5 text-sm font-medium">
+      <% if user_signed_in? %>
+        <% nav_links = {
+          "My Shelters" => shelters_path,
+          "Browse" => browse_shelters_path,
+          "Edit Account" => edit_user_registration_path
+        } %>
+
+        <% nav_links.each do |label, path| %>
+          <%= link_to label, path,
+            class: "px-2 py-1 rounded-md transition-colors #{current_page?(path) ? 'text-rose-600 font-semibold underline' : 'text-gray-700 hover:text-gray-900'}" %>
+        <% end %>
+
+        <%= link_to "Sign out", destroy_user_session_path,
+          data: { turbo_method: :delete },
+          class: "inline-flex items-center rounded-md bg-rose-600 px-3 py-1.5 text-white hover:bg-rose-700 transition" %>
+
+      <% else %>
+        <%= link_to "Sign in", new_user_session_path,
+          class: "text-gray-700 hover:text-gray-900 px-2 py-1" %>
+        <%= link_to "Sign up", new_user_registration_path,
+          class: "inline-flex items-center rounded-md bg-rose-600 px-3 py-1.5 text-white hover:bg-rose-700 transition" %>
+      <% end %>
+    </div>
+  </div>
+</nav>
