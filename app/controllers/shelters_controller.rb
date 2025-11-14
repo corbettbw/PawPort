@@ -15,7 +15,25 @@ class SheltersController < ApplicationController
 
   def new
     @shelter = Shelter.new
+
+    if params[:q].present?
+      q = params[:q].to_s.strip
+
+      # very light heuristics; harmless if nothing matches
+      email  = q[URI::MailTo::EMAIL_REGEXP] rescue nil
+      phone  = q[/\+?\d[\d\-\s\(\)]{7,}\d/]&.gsub(/\D/, '') # keep digits
+      name_guess = q
+        .sub(email.to_s, '')
+        .sub(phone.to_s, '')
+        .squish.presence
+
+      @shelter.name         ||= name_guess
+      @shelter.contact_email ||= email
+      @shelter.phone        ||= phone
+      @shelter.address      ||= q if q.include?(',') # crude hint for addresses
+    end
   end
+
 
   def create
     @shelter = Shelter.new(shelter_params)

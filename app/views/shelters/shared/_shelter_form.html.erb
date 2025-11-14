@@ -1,0 +1,54 @@
+<%= form_with(model: @shelter, html: {novalidate: true, class: "space-y-6"}) do |f| %>
+  <% if @shelter.errors.any? %>
+  <div class="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+    <p class="font-semibold mb-2">
+      <%= pluralize(@shelter.errors.count, "error") %> prevented this shelter from being saved:
+    </p>
+
+    <ul class="list-disc pl-5 space-y-1">
+      <% @shelter.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+  <div>
+    <%= f.label :name %>
+    <%= f.text_field :name, required: true %>
+  </div>
+
+  <div>
+    <%= f.label :address %>
+    <%= f.text_field :address, required: true, minlength: 5 %>
+  </div>
+
+  <div>
+    <%= f.label :phone %>
+    <%= f.telephone_field :phone,
+          inputmode: "tel",
+          pattern: "\\+?[0-9\\-\\s\\(\\)]{10,20}",
+          title: "Phone like +1 555 123 4567" %>
+  </div>
+
+  <div>
+    <%= f.label :contact_email %>
+    <%= f.email_field :contact_email, autocomplete: "email" %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :capacity %>
+      <%= f.number_field :capacity, min: 0, step: 1, required: true %>
+    </div>
+    <div>
+      <%= f.label :vacancies %>
+      <%= f.number_field :vacancies, min: 0, step: 1, required: true %>
+    </div>
+  </div>
+
+  <div class="pt-4">
+    <%= f.submit (@shelter.persisted? ? "Update shelter" : "Create shelter"),
+          class: "btn btn-primary" %>
+  </div>
+<% end %>

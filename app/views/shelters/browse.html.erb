@@ -1,7 +1,10 @@
 <!-- app/views/shelters/browse.html.erb -->
-<div class="max-w-3xl mx-auto p-6">
-  <h1 class="text-2xl font-semibold mb-4">Find a shelter</h1>
-
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-semibold">Find a shelter</h1>
+  <%= link_to "Create Shelter",
+      new_shelter_path(q: params[:q].to_s.strip.presence),
+      class: "btn btn-primary" %>
+    </div>
   <%= form_with url: browse_shelters_path, method: :get, local: true, class: "mb-6 flex gap-2" do %>
     <%= text_field_tag :q, @q, placeholder: "Search by name, address, or email", class: "w-full border rounded px-3 py-2" %>
     <%= submit_tag "Search", class: "btn btn-primary" %>
@@ -12,7 +15,7 @@
       <% @shelters.each do |shelter| %>
         <li class="py-3 flex items-center justify-between">
           <div>
-            <div class="font-medium"><%= shelter.name %></div>
+            <%= link_to shelter.name, shelter_path(shelter), class: "font-medium hover:underline" %>
             <div class="text-sm text-gray-600"><%= shelter.address %></div>
           </div>
 
