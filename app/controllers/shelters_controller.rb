@@ -11,6 +11,13 @@ class SheltersController < ApplicationController
   end
 
   def show
+    @shelter = Shelter.find(params[:id])
+
+    if current_user
+      @membership = current_user.memberships.find_by(shelter: @shelter)
+    end
+
+    @is_member = @membership.present?
   end
 
   def new
