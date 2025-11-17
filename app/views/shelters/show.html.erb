@@ -1,21 +1,37 @@
-<div class="mt-10">
-  <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
-</div>
-
 <% if @is_member %>
-  <div class="max-w-6xl mx-auto mt-8 md:flex md:space-x-6">
-    <!-- Sidebar (empty for now – Component 2) -->
-    <aside class="w-full md:w-64 mb-6 md:mb-0">
-      <div class="bg-slate-100 rounded-2xl p-4 text-slate-500 text-sm">
-        Sidebar placeholder
-      </div>
-    </aside>
+  <div class="max-w-6xl mx-auto pt-6 md:pt-8">
+    <div class="md:flex md:items-start md:space-x-6">
+      <!-- Sidebar column -->
+      <aside class="w-full md:w-64 mb-6 md:mb-0">
+        <%= render "shelters/shared/sidebar" %>
+      </aside>
 
-    <!-- Main control-panel content (empty for now) -->
-    <main class="flex-1">
-      <div class="bg-white rounded-2xl shadow-sm p-6 text-slate-500">
-        Control panel content will appear here after sidebar + tabs are added.
-      </div>
-    </main>
+      <!-- Right column: card on top, tab content below -->
+      <main class="flex-1 space-y-4">
+        <!-- Public card (top) -->
+        <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
+
+        <!-- Tab content (below card) -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <% case @tab %>
+          <% when 'home' %>
+            <%= render "shelters/shared/tab_home" %>
+          <% when 'network' %>
+            <%= render "shelters/shared/tab_network" %>
+          <% when 'transfers' %>
+            <%= render "shelters/shared/tab_transfers" %>
+          <% when 'messages' %>
+            <%= render "shelters/shared/tab_messages" %>
+          <% when 'settings' %>
+            <%= render "shelters/shared/tab_settings" %>
+          <% end %>
+        </div>
+      </main>
+    </div>
+  </div>
+<% else %>
+  <!-- Public-only version -->
+  <div class="max-w-6xl mx-auto pt-8">
+    <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
   </div>
 <% end %>

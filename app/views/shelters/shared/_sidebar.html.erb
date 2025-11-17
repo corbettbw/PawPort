@@ -1,0 +1,21 @@
+<% tabs = {
+  'home'      => 'Home',
+  'network'   => 'Shelter Network',
+  'transfers' => 'Transfers',
+  'messages'  => 'Messages',
+  'settings'  => 'Settings'
+} %>
+
+<nav class="bg-slate-100 rounded-2xl p-3 space-y-1 text-sm">
+  <% tabs.each do |key, label| %>
+    <% active = (key == @tab) %>
+    <%= link_to shelter_path(@shelter, tab: key),
+                class: [
+                  "block rounded-xl px-3 py-2 transition",
+                  (active ? "bg-white shadow-sm text-slate-900 font-medium" :
+                            "text-slate-600 hover:bg-slate-200")
+                ].join(" ") do %>
+      <%= label %>
+    <% end %>
+  <% end %>
+</nav>

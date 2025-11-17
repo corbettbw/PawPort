@@ -18,6 +18,9 @@ class SheltersController < ApplicationController
     end
 
     @is_member = @membership.present?
+    
+    allowed_tabs = %w[home network transfers messages settings]
+    @tab = params[:tab].presence_in(allowed_tabs) || 'home'
   end
 
   def new
