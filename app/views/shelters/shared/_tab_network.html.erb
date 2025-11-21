@@ -1,4 +1,62 @@
-<h2 class="text-lg font-semibold text-slate-900 mb-2">Shelter Network</h2>
-<p class="text-sm text-slate-600">
-  A sortable list of other shelters will appear here (by distance, vacancies, etc.).
-</p>
+<div>
+  <h2 class="text-xl font-semibold mb-4">Shelter Network</h2>
+
+  <!-- Controls: sort + filter -->
+  <div class="flex flex-wrap items-center gap-4 mb-6">
+    <%= form_with url: shelter_path(@shelter), method: :get, local: true, class: "flex flex-wrap items-center gap-3" do %>
+      <%= hidden_field_tag :tab, "network" %>
+
+      <div class="flex items-center gap-2">
+        <label for="sort" class="text-sm font-medium text-slate-700">Sort by:</label>
+        <%= select_tag :sort,
+              options_for_select(
+                [
+                  ["Name",      "name"],
+                  ["Distance",  "distance"],
+                  ["Vacancies", "vacancy"],
+                  ["Capacity",  "capacity"]
+                ],
+                params[:sort]
+              ),
+              class: "border rounded-lg px-2 py-1 text-sm" %>
+      </div>
+
+      <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+        <%= check_box_tag :only_with_vacancies, "1", params[:only_with_vacancies] == "1" %>
+        Only shelters with vacancies
+      </label>
+
+      <%= submit_tag "Apply",
+            class: "px-3 py-1.5 rounded-lg bg-slate-800 text-white text-sm hover:bg-slate-900" %>
+    <% end %>
+  </div>
+
+  <!-- List -->
+  <% if @network_shelters.blank? %>
+    <p class="text-sm text-slate-500">No other shelters found yet.</p>
+  <% else %>
+    <div class="space-y-3">
+      <% @network_shelters.each do |s| %>
+        <% distance = s.distance_to(@shelter) %>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm flex justify-between items-center">
+          <div>
+            <div class="font-semibold text-slate-900"><%= s.name %></div>
+            <div class="text-slate-600 text-sm"><%= s.address %></div>
+
+            <% if distance.present? %>
+              <div class="text-xs text-slate-500 mt-1">
+                ~ <%= distance.round(1) %> miles away
+              </div>
+            <% end %>
+          </div>
+
+          <div class="text-right text-sm text-slate-700">
+            <div>Capacity: <%= s.total_capacity %></div>
+            <div>Vacancies: <%= s.total_available %></div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

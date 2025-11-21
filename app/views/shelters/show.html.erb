@@ -1,31 +1,36 @@
 <% if @is_member %>
   <div class="max-w-6xl mx-auto pt-6 md:pt-8">
     <div class="md:flex md:items-start md:space-x-6">
-      <!-- Sidebar column -->
+      <!-- Sidebar -->
       <aside class="w-full md:w-64 mb-6 md:mb-0">
         <%= render "shelters/shared/sidebar" %>
       </aside>
 
-      <!-- Right column: card on top, tab content below -->
+      <!-- Main column -->
       <main class="flex-1 space-y-4">
-        <!-- Public card (top) -->
-        <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
+        <% if @tab == 'settings' %>
+          <!-- For Settings tab: show the edit form instead of the public card -->
+          <%= render "shelters/shared/shelter_form", shelter: @shelter %>
+        <% else %>
+          <!-- For all other tabs: show the read-only public card -->
+          <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
+        <% end %>
 
-        <!-- Tab content (below card) -->
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-          <% case @tab %>
-          <% when 'home' %>
-            <%= render "shelters/shared/tab_home" %>
-          <% when 'network' %>
-            <%= render "shelters/shared/tab_network" %>
-          <% when 'transfers' %>
-            <%= render "shelters/shared/tab_transfers" %>
-          <% when 'messages' %>
-            <%= render "shelters/shared/tab_messages" %>
-          <% when 'settings' %>
-            <%= render "shelters/shared/tab_settings" %>
-          <% end %>
-        </div>
+        <% unless @tab == 'settings' %>
+          <!-- Tab content card only for non-settings tabs -->
+          <div class="bg-white rounded-2xl shadow-sm p-6">
+            <% case @tab %>
+            <% when 'home' %>
+              <%= render "shelters/shared/tab_home" %>
+            <% when 'network' %>
+              <%= render "shelters/shared/tab_network" %>
+            <% when 'transfers' %>
+              <%= render "shelters/shared/tab_transfers" %>
+            <% when 'messages' %>
+              <%= render "shelters/shared/tab_messages" %>
+            <% end %>
+          </div>
+        <% end %>
       </main>
     </div>
   </div>
