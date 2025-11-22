@@ -14,7 +14,10 @@
         <% else %>
           <!-- For all other tabs: show the read-only public card -->
           <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
+        <!-- Stats card: visible to members on all tabs -->
+        <%= render "shelters/shared/stats_card", shelter: @shelter %>
         <% end %>
+
 
         <% unless @tab == 'settings' %>
           <!-- Tab content card only for non-settings tabs -->
@@ -36,7 +39,8 @@
   </div>
 <% else %>
   <!-- Public-only version -->
-  <div class="max-w-6xl mx-auto pt-8">
+  <div class="max-w-6xl mx-auto pt-8 space-y-4">
     <%= render "shelters/shared/public_shelter_profile", shelter: @shelter %>
+    <%= render "shelters/shared/stats_card", shelter: @shelter %>
   </div>
 <% end %>

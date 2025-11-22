@@ -50,6 +50,13 @@ class Shelter < ApplicationRecord
         vacancies.to_i
     end
     
+    def occupancy_percent
+        return 0 if total_capacity <= 0
+
+        occupied = total_capacity - total_available 
+        ((occupied.to_f / total_capacity) * 100).round
+    end
+    
     # Geocoding trigger: only geocode when something in the address changed
     def address_changed_for_geocoding?
         will_save_change_to_address?
