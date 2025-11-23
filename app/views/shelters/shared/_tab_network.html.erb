@@ -1,62 +1,98 @@
-<div>
-  <h2 class="text-xl font-semibold mb-4">Shelter Network</h2>
+<!-- app/views/shelters/shared/_tab_network.html.erb -->
 
-  <!-- Controls: sort + filter -->
-  <div class="flex flex-wrap items-center gap-4 mb-6">
-    <%= form_with url: shelter_path(@shelter), method: :get, local: true, class: "flex flex-wrap items-center gap-3" do %>
-      <%= hidden_field_tag :tab, "network" %>
-
-      <div class="flex items-center gap-2">
-        <label for="sort" class="text-sm font-medium text-slate-700">Sort by:</label>
-        <%= select_tag :sort,
-              options_for_select(
-                [
-                  ["Name",      "name"],
-                  ["Distance",  "distance"],
-                  ["Vacancies", "vacancy"],
-                  ["Capacity",  "capacity"]
-                ],
-                params[:sort]
-              ),
-              class: "border rounded-lg px-2 py-1 text-sm" %>
-      </div>
-
-      <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-        <%= check_box_tag :only_with_vacancies, "1", params[:only_with_vacancies] == "1" %>
-        Only shelters with vacancies
-      </label>
-
-      <%= submit_tag "Apply",
-            class: "px-3 py-1.5 rounded-lg bg-slate-800 text-white text-sm hover:bg-slate-900" %>
-    <% end %>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="space-y-1">
+    <h2 class="text-lg font-semibold text-slate-900">Shelter Network</h2>
+    <p class="text-sm text-slate-600">
+      Nearby shelters and partners. Use the map or list to see who has space available.
+    </p>
   </div>
 
-  <!-- List -->
-  <% if @network_shelters.blank? %>
-    <p class="text-sm text-slate-500">No other shelters found yet.</p>
-  <% else %>
+  <!-- Map -->
+  <div
+    class="h-80 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
+    data-controller="network-map"
+    data-network-map-shelters-value="<%= @network_shelters.map { |s|
+      {
+        id: s.id,
+        name: s.name,
+        address: s.address,
+        latitude: s.latitude,
+        longitude: s.longitude,
+        vacancies: s.total_available,
+        capacity: s.total_capacity
+      }
+    }.to_json %>"
+  ></div>
+
+  <!-- Controls + list -->
+  <div class="space-y-4">
+    <!-- Sort/filter controls -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <%= form_with url: shelter_path(@shelter), method: :get, local: true, class: "flex flex-wrap items-center gap-3 text-sm" do %>
+        <%= hidden_field_tag :tab, "network" %>
+
+        <div class="flex items-center gap-2">
+          <label for="sort" class="font-medium text-slate-700">Sort by:</label>
+          <%= select_tag :sort,
+                options_for_select(
+                  [
+                    ["Distance", "distance"],
+                    ["Vacancies", "vacancy"],
+                    ["Capacity", "capacity"]
+                  ],
+                  params[:sort]
+                ),
+                class: "border border-slate-300 rounded-lg px-2 py-1 text-sm bg-white" %>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <%= check_box_tag :only_with_vacancies, "1", params[:only_with_vacancies] == "1", class: "rounded border-slate-300" %>
+          <label for="only_with_vacancies" class="text-slate-700">
+            Only show shelters with vacancies
+          </label>
+        </div>
+
+        <%= submit_tag "Apply",
+              class: "px-3 py-1.5 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800" %>
+      <% end %>
+
+      <p class="text-xs text-slate-500">
+        Showing <%= @network_shelters.size %> shelters.
+      </p>
+    </div>
+
+    <!-- List -->
     <div class="space-y-3">
       <% @network_shelters.each do |s| %>
-        <% distance = s.distance_to(@shelter) %>
-
-        <div class="bg-white rounded-xl p-4 shadow-sm flex justify-between items-center">
+        <div class="bg-white rounded-2xl border border-slate-100 px-4 py-3 shadow-sm flex items-center justify-between gap-4">
           <div>
             <div class="font-semibold text-slate-900"><%= s.name %></div>
-            <div class="text-slate-600 text-sm"><%= s.address %></div>
-
-            <% if distance.present? %>
-              <div class="text-xs text-slate-500 mt-1">
-                ~ <%= distance.round(1) %> miles away
-              </div>
-            <% end %>
+            <div class="text-xs text-slate-500"><%= s.address %></div>
           </div>
 
-          <div class="text-right text-sm text-slate-700">
-            <div>Capacity: <%= s.total_capacity %></div>
-            <div>Vacancies: <%= s.total_available %></div>
+          <div class="flex items-center gap-6 text-sm">
+            <div class="text-right">
+              <div class="text-xs uppercase tracking-wide text-slate-500">Capacity</div>
+              <div class="font-semibold text-slate-900"><%= s.total_capacity %></div>
+            </div>
+
+            <div class="text-right">
+              <div class="text-xs uppercase tracking-wide text-slate-500">Vacancies</div>
+              <div class="font-semibold <%= (s.total_available || 0) > 0 ? 'text-emerald-600' : 'text-slate-900' %>">
+                <%= s.total_available || 0 %>
+              </div>
+            </div>
           </div>
         </div>
       <% end %>
+
+      <% if @network_shelters.empty? %>
+        <p class="text-sm text-slate-500">
+          No other shelters found. Try adjusting filters or adding more shelters.
+        </p>
+      <% end %>
     </div>
-  <% end %>
+  </div>
 </div>
