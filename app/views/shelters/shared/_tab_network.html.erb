@@ -9,10 +9,14 @@
     </p>
   </div>
 
+  
+
   <!-- Map -->
   <div
     class="h-80 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200"
     data-controller="network-map"
+    data-network-map-home-latitude-value="<%= @shelter.latitude %>"
+    data-network-map-home-longitude-value="<%= @shelter.longitude %>"
     data-network-map-shelters-value="<%= @network_shelters.map { |s|
       {
         id: s.id,
@@ -23,8 +27,27 @@
         vacancies: s.total_available,
         capacity: s.total_capacity
       }
-    }.to_json %>"
-  ></div>
+    }.to_json %>">
+  </div>
+  <!-- Legend -->
+  <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 mt-2">
+    <div class="flex items-center gap-1">
+      <span class="inline-block h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+      Home Shelter
+    </div>
+    <div class="flex items-center gap-1">
+      <span class="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+      Plenty of space
+    </div>
+    <div class="flex items-center gap-1">
+      <span class="inline-block h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+      Limited space
+    </div>
+    <div class="flex items-center gap-1">
+      <span class="inline-block h-2.5 w-2.5 rounded-full bg-red-500"></span>
+      No vacancies
+    </div>
+  </div>
 
   <!-- Controls + list -->
   <div class="space-y-4">
