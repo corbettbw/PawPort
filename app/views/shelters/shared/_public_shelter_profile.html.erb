@@ -1,0 +1,31 @@
+<% shelter = local_assigns[:shelter] || @shelter %>
+
+<div class="bg-white rounded-2xl shadow-sm px-6 py-5">
+  <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+
+    <!-- Left: name + contact -->
+    <div class="space-y-3">
+      <h1 class="text-xl font-semibold text-slate-900">
+        <%= shelter.name %>
+      </h1>
+
+      <div class="space-y-1 text-sm text-slate-600">
+        <div>
+          <span class="font-medium text-slate-500">Address:</span>
+          <span class="ml-1"><%= shelter.address %></span>
+        </div>
+
+        <div>
+          <span class="font-medium text-slate-500">Phone:</span>
+          <span class="ml-1"><%= shelter.phone.presence || "—" %></span>
+        </div>
+
+        <div>
+          <span class="font-medium text-slate-500">Contact Email:</span>
+          <span class="ml-1"><%= shelter.contact_email.presence || "—" %></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

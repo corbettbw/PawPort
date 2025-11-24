@@ -1,54 +1,98 @@
-<%= form_with(model: @shelter, html: {novalidate: true, class: "space-y-6"}) do |f| %>
-  <% if @shelter.errors.any? %>
-  <div class="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-    <p class="font-semibold mb-2">
-      <%= pluralize(@shelter.errors.count, "error") %> prevented this shelter from being saved:
-    </p>
+<!-- app/views/shelters/shared/_settings_form.html.erb -->
 
-    <ul class="list-disc pl-5 space-y-1">
-      <% @shelter.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
+<div class="bg-white rounded-2xl shadow-sm p-6">
+  <h2 class="text-lg font-semibold mb-4">Settings</h2>
 
-  <div>
-    <%= f.label :name %>
-    <%= f.text_field :name, required: true %>
-  </div>
+  <%= form_with(model: @shelter, html: { novalidate: true, class: "space-y-6" }) do |f| %>
+    <% if @shelter.errors.any? %>
+      <div class="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <p class="font-semibold mb-2">
+          <%= pluralize(@shelter.errors.count, "error") %> prevented this shelter from being saved:
+        </p>
 
-  <div>
-    <%= f.label :address %>
-    <%= f.text_field :address, required: true, minlength: 5 %>
-  </div>
+        <ul class="list-disc pl-5 space-y-1">
+          <% @shelter.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
 
-  <div>
-    <%= f.label :phone %>
-    <%= f.telephone_field :phone,
-          inputmode: "tel",
-          pattern: "\\+?[0-9\\-\\s\\(\\)]{10,20}",
-          title: "Phone like +1 555 123 4567" %>
-  </div>
-
-  <div>
-    <%= f.label :contact_email %>
-    <%= f.email_field :contact_email, autocomplete: "email" %>
-  </div>
-
-  <div class="grid grid-cols-2 gap-4">
     <div>
-      <%= f.label :capacity %>
-      <%= f.number_field :capacity, min: 0, step: 1, required: true %>
+      <%= f.label :name %>
+      <%= f.text_field :name, required: true %>
     </div>
-    <div>
-      <%= f.label :vacancies %>
-      <%= f.number_field :vacancies, min: 0, step: 1, required: true %>
-    </div>
-  </div>
 
-  <div class="pt-4">
-    <%= f.submit (@shelter.persisted? ? "Update shelter" : "Create shelter"),
-          class: "btn btn-primary" %>
-  </div>
-<% end %>
+    <div>
+      <%= f.label :address %>
+      <%= f.text_field :address, required: true, minlength: 5 %>
+    </div>
+
+    <div>
+      <%= f.label :phone %>
+      <%= f.telephone_field :phone,
+            inputmode: "tel",
+            pattern: "\\+?[0-9\\-\\s\\(\\)]{10,20}",
+            title: "Phone like +1 555 123 4567" %>
+    </div>
+
+    <div>
+      <%= f.label :contact_email %>
+      <%= f.email_field :contact_email, autocomplete: "email" %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :capacity %>
+        <%= f.number_field :capacity, min: 0, step: 1, required: true %>
+      </div>
+      <div>
+        <%= f.label :vacancies %>
+        <%= f.number_field :vacancies, min: 0, step: 1, required: true %>
+      </div>
+    </div>
+
+    <% if @shelter.persisted? %>
+      <!-- EDIT LAYOUT -->
+      <div class="mt-6 flex justify-between items-center">
+        <div>
+          <%= f.submit "Update shelter", class: "btn btn-primary" %>
+        </div>
+
+        <div class="flex gap-3">
+          <%= link_to "Delete",
+                      @shelter,
+                      data: { turbo_method: :delete, turbo_confirm: "Delete this shelter?" },
+                      class: "px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700" %>
+
+          <%= link_to "Cancel",
+                      shelter_path(@shelter),
+                      class: "px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200" %>
+        </div>
+      </div>
+    <% else %>
+      <!-- NEW LAYOUT -->
+      <div class="mt-6 flex justify-between items-center">
+        <div>
+          <%= f.submit "Create shelter", class: "btn btn-primary" %>
+        </div>
+
+        <div>
+          <%= link_to "Cancel",
+                      shelters_path,
+                      class: "px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if current_user.memberships.exists?(shelter_id: @shelter.id) %>
+    <div class="mt-4">
+      <%= button_to "Leave shelter",
+                    leave_shelter_path(@shelter),
+                    method: :delete,
+                    data: { turbo_confirm: "Leave this shelter?" },
+                    class: "px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800" %>
+    </div>
+  <% end %>
+</div>

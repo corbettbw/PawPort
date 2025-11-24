@@ -1,5 +1,5 @@
 class SheltersController < ApplicationController
-  before_action :set_shelter, only: [:show, :edit, :update, :destroy]
+  before_action :set_shelter, only: [:show, :edit, :update, :destroy, :leave]
   before_action :authenticate_user!
 
   def index
@@ -11,6 +11,20 @@ class SheltersController < ApplicationController
   end
 
   def show
+    @shelter = Shelter.find(params[:id])
+
+    if current_user
+      @membership = current_user.memberships.find_by(shelter: @shelter)
+    end
+
+    @is_member = @membership.present?
+    
+    allowed_tabs = %w[home network transfers messages settings]
+    @tab = params[:tab].presence_in(allowed_tabs) || 'home'
+
+    if @tab == "network"
+      load_network_shelters
+    end
   end
 
   def new
@@ -88,6 +102,33 @@ class SheltersController < ApplicationController
 
 
   private
+  def load_network_shelters
+    scope = Shelter.where.not(id: @shelter.id)
+
+    if params[:only_with_vacancies] == "1"
+      scope = scope.where("vacancies > 0")
+    end
+
+    shelters = scope.to_a
+
+    @network_shelters = shelters.sort_by do |s|
+      case params[:sort]
+      when "distance"
+        # geocoder's distance_to: returns distance in miles by default
+        if s.latitude && s.longitude && @shelter.latitude && @shelter.longitude
+          s.distance_to(@shelter)
+        else
+          Float::INFINITY
+        end
+      when 'vacancy'
+        -s.total_available          # higher vacancies first
+      when 'capacity'
+        -s.total_capacity           # higher capacity first
+      else
+        s.name                      # fallback: alphabetical
+      end
+    end
+  end
 
   def set_shelter
     @shelter = Shelter.find(params[:id])

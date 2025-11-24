@@ -1,0 +1,42 @@
+<% shelter = local_assigns[:shelter] || @shelter %>
+
+<div class="bg-white rounded-2xl shadow-sm p-6">
+  <div class="space-y-3">
+    <h2 class="text-lg font-semibold text-slate-900">Shelter Stats</h2>
+    <p class="text-sm text-slate-600">
+      Quick snapshot of capacity, open spots, and occupancy.
+    </p>
+  </div>
+
+  <div class="mt-4 grid gap-4 sm:grid-cols-3">
+    <!-- Total Capacity -->
+    <div class="min-w-[140px] rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+      <div class="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+        Total Capacity
+      </div>
+      <div class="mt-2 text-2xl font-semibold text-slate-900">
+        <%= shelter.capacity || 0 %>
+      </div>
+    </div>
+
+    <!-- Vacancies -->
+    <div class="min-w-[140px] rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+      <div class="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+        Vacancies
+      </div>
+      <div class="mt-2 text-2xl font-semibold <%= (shelter.vacancies || 0) > 0 ? 'text-emerald-600' : 'text-slate-900' %>">
+        <%= shelter.vacancies || 0 %>
+      </div>
+    </div>
+
+    <!-- Occupancy -->
+    <div class="min-w-[140px] rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
+      <div class="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+        Occupancy
+      </div>
+      <div class="mt-2 text-2xl font-semibold text-slate-900">
+        <%= shelter.occupancy_percent %>%
+      </div>
+    </div>
+  </div>
+</div>

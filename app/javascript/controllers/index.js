@@ -3,8 +3,12 @@
 // ./bin/rails generate stimulus controllerName
 
 import { application } from "./application"
+
 import FlashController from "./flash_controller"
 import HelloController from "./hello_controller"
+import NetworkMapController from "./network_map_controller"
 
+// Register controllers
 application.register("hello", HelloController)
 application.register("flash", FlashController)
+application.register("network-map", NetworkMapController)
