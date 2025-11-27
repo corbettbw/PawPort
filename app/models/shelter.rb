@@ -2,6 +2,9 @@ class Shelter < ApplicationRecord
     has_many :memberships, dependent: :destroy
     has_many :users, through: :memberships
 
+    has_many :animals,
+        foreign_key: :home_shelter_id,
+        dependent: :nullify
     # -------- Geocoding --------
     geocoded_by :address
 

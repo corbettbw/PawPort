@@ -10,9 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_17_211624) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_27_045418) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "animals", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "age_years"
+    t.integer "age_months"
+    t.string "species", null: false
+    t.string "sex", null: false
+    t.decimal "weight", precision: 5, scale: 2
+    t.boolean "microchipped", default: false
+    t.string "temperament_tags", default: [], array: true
+    t.text "bio"
+    t.string "status", null: false
+    t.date "intake_date", null: false
+    t.integer "home_shelter_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["home_shelter_id"], name: "index_animals_on_home_shelter_id"
+    t.index ["species"], name: "index_animals_on_species"
+    t.index ["status"], name: "index_animals_on_status"
+    t.index ["temperament_tags"], name: "index_animals_on_temperament_tags", using: :gin
+  end
 
   create_table "memberships", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -50,6 +71,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_17_211624) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "animals", "shelters", column: "home_shelter_id"
   add_foreign_key "memberships", "shelters"
   add_foreign_key "memberships", "users"
 end

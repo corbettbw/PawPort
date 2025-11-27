@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  age_years: 1
+  age_months: 1
+  species: MyString
+  sex: MyString
+  weight: 9.99
+  microchipped: false
+  temperament_tags: MyString
+  bio: MyText
+  status: MyString
+  intake_date: 2025-11-26
+  home_shelter_id: 1
+
+two:
+  name: MyString
+  age_years: 1
+  age_months: 1
+  species: MyString
+  sex: MyString
+  weight: 9.99
+  microchipped: false
+  temperament_tags: MyString
+  bio: MyText
+  status: MyString
+  intake_date: 2025-11-26
+  home_shelter_id: 1
