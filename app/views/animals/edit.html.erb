@@ -1,0 +1,64 @@
+<h1>Edit Animal</h1>
+
+<%= form_with model: @animal do |f| %>
+  <% if @animal.errors.any? %>
+    <div class="errors">
+      <h2><%= pluralize(@animal.errors.count, "error") %> prevented this animal from being saved:</h2>
+      <ul>
+        <% @animal.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>
+    <%= f.label :age_years, "Age (years)" %><br>
+    <%= f.number_field :age_years, min: 0 %>
+  </div>
+
+  <div>
+    <%= f.label :age_months, "Age (months)" %><br>
+    <%= f.number_field :age_months, min: 0, max: 11 %>
+  </div>
+
+  <div>
+    <%= f.label :species %><br>
+    <%= f.select :species, Animal::SPECIES.map { |s| [s.humanize, s] }, prompt: "Select species" %>
+  </div>
+
+  <div>
+    <%= f.label :sex %><br>
+    <%= f.select :sex, Animal::SEXES.map { |s| [s.humanize, s] }, prompt: "Select sex" %>
+  </div>
+
+  <div>
+    <%= f.label :weight, "Weight" %><br>
+    <%= f.number_field :weight, step: 0.1, min: 0 %>
+  </div>
+
+  <div>
+    <%= f.label :microchipped %><br>
+    <%= f.check_box :microchipped %>
+  </div>
+
+  <div>
+    <%= f.label :temperament_tags, "Temperament / Compatibility" %><br>
+    <%= f.text_field :temperament_tags, value: @animal.temperament_tags.join(", ") %>
+    <p>For now, enter comma-separated tags (we'll make this nicer later).</p>
+  </div>
+
+  <div>
+    <%= f.label :bio %><br>
+    <%= f.text_area :bio, rows: 5 %>
+  </div>
+
+  <div>
+    <%= f.submit "Save", class: "btn btn-primary" %>
+  </div>
+<% end %>

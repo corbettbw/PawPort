@@ -1,0 +1,35 @@
+<h1><%= @animal.name %></h1>
+
+<p>
+  <strong>Species:</strong> <%= @animal.species.humanize %><br>
+  <strong>Sex:</strong> <%= @animal.sex.humanize %><br>
+  <strong>Age:</strong>
+  <% if @animal.age_years.present? || @animal.age_months.present? %>
+    <%= @animal.age_years.to_i %> years,
+    <%= @animal.age_months.to_i %> months
+  <% else %>
+    Unknown
+  <% end %><br>
+  <strong>Status:</strong> <%= @animal.status.humanize %><br>
+  <strong>Intake date:</strong> <%= @animal.intake_date %><br>
+  <strong>Home shelter:</strong> <%= @animal.home_shelter.name %><br>
+</p>
+
+<p>
+  <strong>Temperament / compatibility:</strong>
+  <% if @animal.temperament_tags.present? %>
+    <%= @animal.temperament_tags.join(", ") %>
+  <% else %>
+    None recorded
+  <% end %>
+</p>
+
+<p>
+  <strong>Bio:</strong><br>
+  <%= simple_format(@animal.bio) %>
+</p>
+
+<p>
+  <%= link_to "Edit", edit_animal_path(@animal) %> |
+  <%= link_to "Back to shelter", shelter_path(@animal.home_shelter) %>
+</p>

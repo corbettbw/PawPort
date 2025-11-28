@@ -1,0 +1,36 @@
+<h1><%= @shelter.name %> – Roster</h1>
+
+<p>
+  <%= link_to "Intake New Animal",
+              new_shelter_animal_path(@shelter),
+              class: "btn btn-primary" %>
+</p>
+
+<% if @animals.any? %>
+  <table class="min-w-full mt-4">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Species</th>
+        <th>Sex</th>
+        <th>Status</th>
+        <th>Intake Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @animals.each do |animal| %>
+        <tr>
+          <td><%= animal.name %></td>
+          <td><%= animal.species.humanize %></td>
+          <td><%= animal.sex.humanize %></td>
+          <td><%= animal.status.humanize %></td>
+          <td><%= animal.intake_date %></td>
+          <td><%= link_to "View", animal_path(animal) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No animals in this shelter’s roster yet.</p>
+<% end %>

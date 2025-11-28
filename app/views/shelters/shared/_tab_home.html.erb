@@ -1,6 +1,9 @@
-<div class="space-y-3">
-  <h2 class="text-lg font-semibold text-slate-900">Shelter Command Center</h2>
-  <p class="text-sm text-slate-600">
-    This will be the main overview for the shelter (intake placeholder, capacity summary, etc.).
-  </p>
+<div class="mt-4 flex flex-wrap gap-3">
+  <%= link_to "View Roster",
+              shelter_animals_path(@shelter),
+              class: "btn btn-primary" %>
+
+  <%= link_to "Intake New Animal",
+              new_shelter_animal_path(@shelter),
+              class: "btn btn-outline" %>
 </div>
