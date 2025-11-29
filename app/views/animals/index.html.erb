@@ -1,36 +1,157 @@
-<h1><%= @shelter.name %> – Roster</h1>
+<div class="flex justify-between items-center mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-slate-900">
+      <%= @shelter.name %> – Roster
+    </h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Search, filter, and sort all animals whose home shelter is <%= @shelter.name %>.
+    </p>
+  </div>
 
-<p>
-  <%= link_to "Intake New Animal",
-              new_shelter_animal_path(@shelter),
-              class: "btn btn-primary" %>
-</p>
+  <div class="flex gap-2">
+    <%= link_to "Back to Shelter",
+                shelter_path(@shelter),
+                class: "inline-flex items-center px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium text-slate-800 bg-white hover:bg-slate-50" %>
+
+    <%= link_to "Intake New Animal",
+                new_shelter_animal_path(@shelter),
+                class: "inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-sm font-medium text-white shadow-sm hover:bg-slate-800" %>
+  </div>
+</div>
+
+<div class="mb-4">
+  <%= form_with url: shelter_animals_path(@shelter), method: :get, local: true, class: "flex flex-wrap gap-3 items-end" do |f| %>
+    <div>
+      <%= f.label :q, "Search", class: "block text-xs font-medium text-slate-600 mb-1" %>
+      <%= f.text_field :q,
+                       value: @q,
+                       placeholder: "Name, species, status…",
+                       class: "block w-56 rounded-lg border border-slate-300 px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :status, "Status", class: "block text-xs font-medium text-slate-600 mb-1" %>
+      <%= f.select :status,
+                   [["Any", ""]] + Animal::STATUSES.map { |s| [s.humanize, s] },
+                   { selected: @status },
+                   class: "block w-40 rounded-lg border border-slate-300 px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :species, "Species", class: "block text-xs font-medium text-slate-600 mb-1" %>
+      <%= f.select :species,
+                   [["Any", ""]] + Animal::SPECIES.map { |s| [s.humanize, s] },
+                   { selected: @species },
+                   class: "block w-40 rounded-lg border border-slate-300 px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :sort, "Sort by", class: "block text-xs font-medium text-slate-600 mb-1" %>
+      <%= f.select :sort,
+                   [["Intake date", "intake_date"],
+                    ["Name", "name"],
+                    ["Status", "status"],
+                    ["Species", "species"]],
+                   { selected: @sort },
+                   class: "block w-40 rounded-lg border border-slate-300 px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :direction, "Direction", class: "block text-xs font-medium text-slate-600 mb-1" %>
+      <%= f.select :direction,
+                   [["Descending", "desc"], ["Ascending", "asc"]],
+                   { selected: @dir },
+                   class: "block w-32 rounded-lg border border-slate-300 px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.submit "Apply",
+                   class: "inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-sm font-medium text-white shadow-sm hover:bg-slate-800" %>
+    </div>
+  <% end %>
+</div>
 
 <% if @animals.any? %>
-  <table class="min-w-full mt-4">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Species</th>
-        <th>Sex</th>
-        <th>Status</th>
-        <th>Intake Date</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @animals.each do |animal| %>
-        <tr>
-          <td><%= animal.name %></td>
-          <td><%= animal.species.humanize %></td>
-          <td><%= animal.sex.humanize %></td>
-          <td><%= animal.status.humanize %></td>
-          <td><%= animal.intake_date %></td>
-          <td><%= link_to "View", animal_path(animal) %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <% @animals.each do |animal| %>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col justify-between">
+        <div class="flex justify-between items-start gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-900">
+              <%= animal.name %>
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              <%= animal.species.humanize %> • <%= animal.sex.humanize %>
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              Intake: <%= animal.intake_date || "Unknown" %>
+            </p>
+            <% if animal.age_years.present? || animal.age_months.present? %>
+              <p class="text-xs text-slate-500">
+                Age:
+                <%= animal.age_years.to_i %>y
+                <%= animal.age_months.to_i %>m
+              </p>
+            <% end %>
+          </div>
+
+          <%# status badge %>
+          <% badge_classes =
+               case animal.status
+               when "in_shelter" then "bg-emerald-100 text-emerald-800"
+               when "in_foster"  then "bg-sky-100 text-sky-800"
+               when "adopted"    then "bg-indigo-100 text-indigo-800"
+               when "deceased"   then "bg-slate-200 text-slate-700"
+               when "in_transit" then "bg-amber-100 text-amber-800"
+               else "bg-slate-100 text-slate-800"
+               end %>
+
+          <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium <%= badge_classes %>">
+            <%= animal.status.humanize %>
+          </span>
+        </div>
+
+        <% if animal.temperament_tags.present? %>
+          <div class="mt-3 flex flex-wrap gap-1">
+            <% animal.temperament_tags.each do |tag| %>
+              <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700">
+                <%= tag.tr("_", " ") %>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="mt-4 flex justify-between items-center">
+          <div class="flex gap-2">
+            <%= link_to "View",
+                        animal_path(animal),
+                        class: "text-xs font-medium text-slate-900 hover:underline" %>
+
+            <%= link_to "Edit",
+                        edit_animal_path(animal),
+                        class: "text-xs font-medium text-slate-500 hover:text-slate-900 hover:underline" %>
+          </div>
+
+          <div class="text-[11px] text-slate-400">
+            Shelter: <%= @shelter.name %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
 <% else %>
-  <p>No animals in this shelter’s roster yet.</p>
+  <div class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+    <p class="text-sm text-slate-600">
+      No animals found for this shelter with the current filters.
+    </p>
+    <div class="mt-4 flex justify-center gap-2">
+      <%= link_to "Clear filters",
+                  shelter_animals_path(@shelter),
+                  class: "inline-flex items-center px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium text-slate-800 bg-white hover:bg-slate-50" %>
+
+      <%= link_to "Intake New Animal",
+                  new_shelter_animal_path(@shelter),
+                  class: "inline-flex items-center px-4 py-2 rounded-xl bg-slate-900 text-sm font-medium text-white shadow-sm hover:bg-slate-800" %>
+    </div>
+  </div>
 <% end %>

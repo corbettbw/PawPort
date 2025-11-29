@@ -7,6 +7,22 @@ class Animal < ApplicationRecord
   STATUSES = %w[in_shelter in_foster adopted deceased in_transit].freeze
   SEXES    = %w[male female unknown].freeze
 
+  TEMPERAMENT_TAGS = %w[
+                        good_with_dogs
+                        good_with_cats
+                        good_with_kids
+                        house_trained
+                        leash_trained
+                        shy
+                        fearful
+                        energetic
+                        aggressive
+                        mellow
+                        special_needs
+                        senior_friendly
+    ].freeze
+
+
   # Validations
   validates :name, presence: true
 
@@ -45,6 +61,6 @@ class Animal < ApplicationRecord
   private
 
   def normalize_temperament_tags
-    self.temperament_tags ||= []
+    self.temperament_tags = Array(temperament_tags).reject(&:blank?)
   end
 end
