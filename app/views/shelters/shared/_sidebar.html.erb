@@ -1,5 +1,6 @@
 <% tabs = {
   'home'      => 'Home',
+  'animals'   => 'Roster',
   'network'   => 'Shelter Network',
   'transfers' => 'Transfers',
   'messages'  => 'Messages',
@@ -8,8 +9,25 @@
 
 <nav class="bg-slate-100 rounded-2xl p-3 space-y-1 text-sm">
   <% tabs.each do |key, label| %>
-    <% active = (key == @tab) %>
-    <%= link_to shelter_path(@shelter, tab: key),
+    <% path =
+      if key == 'animals'
+        # Roster goes to AnimalsController#index
+        shelter_animals_path(@shelter)
+      else
+        # All other tabs still use the tab param on SheltersController#show
+        shelter_path(@shelter, tab: key)
+      end
+    %>
+
+    <% active =
+      if key == 'animals'
+        controller_name == 'animals' && action_name == 'index'
+      else
+        key == @tab
+      end
+    %>
+
+    <%= link_to path,
                 class: [
                   "block rounded-xl px-3 py-2 transition",
                   (active ? "bg-white shadow-sm text-slate-900 font-medium" :

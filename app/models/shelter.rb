@@ -2,6 +2,9 @@ class Shelter < ApplicationRecord
     has_many :memberships, dependent: :destroy
     has_many :users, through: :memberships
 
+    has_many :animals,
+        foreign_key: :home_shelter_id,
+        dependent: :nullify
     # -------- Geocoding --------
     geocoded_by :address
 
@@ -20,7 +23,7 @@ class Shelter < ApplicationRecord
 
     # Numeric integrity
     validates :capacity,  numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-    validates :vacancies, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+    validates :vacancies, numericality: { only_integer: true }
     validate  :vacancies_cannot_exceed_capacity
 
     geocoded_by :address   # method defined below
@@ -73,6 +76,17 @@ class Shelter < ApplicationRecord
         units: :mi
         )
     end
+
+    def over_capacity?
+        total_available < 0
+    end
+
+    def over_capacity_by
+        return 0 unless over_capacity?
+
+        total_available.abs
+    end
+
 
     private
 
