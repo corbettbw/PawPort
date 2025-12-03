@@ -19,25 +19,26 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <%= f.label :animal_id, "Animal", class: "block text-sm font-medium text-slate-700" %>
+          <%= f.label :animal_id, "Animal" %>
           <%= f.select :animal_id,
                        options_from_collection_for_select(@transfer_animals, :id, :name),
                        { prompt: "Select an animal" },
-                       class: "mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" %>
+                       class: "mt-1 text-sm" %>
         </div>
 
         <div>
-          <%= f.label :to_shelter_id, "Destination shelter", class: "block text-sm font-medium text-slate-700" %>
+          <%= f.label :to_shelter_id, "Destination shelter" %>
           <%= f.select :to_shelter_id,
                        options_from_collection_for_select(@transfer_targets, :id, :name),
                        { prompt: "Select a shelter" },
-                       class: "mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" %>
+                       class: "mt-1 text-sm" %>
         </div>
       </div>
 
       <div class="mt-4">
-        <%= f.submit "Request transfer",
-                     class: "inline-flex items-center px-4 py-2 rounded-xl bg-rose-600 text-white text-sm font-medium hover:bg-rose-700" %>
+        <!-- use shared button style -->
+        <%= f.submit "Request transfer", class: "btn-primary rounded-xl" %>
+
       </div>
     <% end %>
   <% else %>
@@ -74,22 +75,31 @@
                               cancel_transfer_path(tr),
                               method: :patch,
                               form: { data: { turbo_confirm: "Cancel this transfer request?" } },
-                              class: "px-3 py-1 rounded-full border border-slate-200 text-slate-600" %>
+                              class: "pill-base pill-clickable pill-outline" %>
+
               <% elsif tr.accepted? %>
                 <%= button_to "Mark in transit",
                               mark_in_transit_transfer_path(tr),
                               method: :patch,
                               form: { data: { turbo_confirm: "Mark this animal as in transit?" } },
-                              class: "px-3 py-1 rounded-full bg-sky-600 text-white" %>
+                              class: "pill-base pill-clickable pill-info" %>
+
                 <%= button_to "Cancel",
                               cancel_transfer_path(tr),
                               method: :patch,
                               form: { data: { turbo_confirm: "Cancel this transfer?" } },
-                              class: "px-3 py-1 rounded-full border border-slate-200 text-slate-600" %>
+                              class: "pill-base pill-clickable pill-outline" %>
+
               <% elsif tr.in_transit? %>
-                <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-amber-700">
+                <span class="pill-base chip-warning">
                   In transit
                 </span>
+
+                <%= button_to "Cancel",
+                              cancel_transfer_path(tr),
+                              method: :patch,
+                              form: { data: { turbo_confirm: "Cancel this transfer and keep the animal at this shelter?" } },
+                              class: "pill-base pill-clickable pill-outline" %>
               <% end %>
             </div>
           </li>
@@ -120,22 +130,32 @@
                 <%= button_to "Accept",
                               accept_transfer_path(tr),
                               method: :patch,
-                              class: "px-3 py-1 rounded-full bg-emerald-600 text-white" %>
+                              class: "pill-base pill-clickable pill-success" %>
+
                 <%= button_to "Reject",
                               reject_transfer_path(tr),
                               method: :patch,
                               form: { data: { turbo_confirm: "Reject this transfer?" } },
-                              class: "px-3 py-1 rounded-full border border-slate-200 text-slate-600" %>
+                              class: "pill-base pill-clickable pill-outline" %>
+
               <% elsif tr.accepted? %>
-                <span class="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-sky-700">
+                <span class="pill-base chip-info">
                   Accepted · waiting for dispatch
                 </span>
+
               <% elsif tr.in_transit? %>
-                <%= button_to "Mark received",
-                              mark_received_transfer_path(tr),
-                              method: :patch,
-                              class: "px-3 py-1 rounded-full bg-emerald-600 text-white" %>
-              <% end %>
+              <%= button_to "Mark received",
+                            mark_received_transfer_path(tr),
+                            method: :patch,
+                            class: "pill-base pill-clickable pill-success" %>
+
+              <%= button_to "Cancel",
+                            cancel_transfer_path(tr),
+                            method: :patch,
+                            form: { data: { turbo_confirm: "Cancel this transfer and keep the animal at the origin shelter?" } },
+                            class: "pill-base pill-clickable pill-outline" %>
+            <% end %>
+
             </div>
           </li>
         <% end %>
