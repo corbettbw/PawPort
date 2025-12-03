@@ -1,6 +1,8 @@
 class Animal < ApplicationRecord
   # Associations
   belongs_to :home_shelter, class_name: "Shelter", foreign_key: :home_shelter_id
+  has_many :transfers, dependent: :destroy
+
 
   # Controlled vocabularies
   SPECIES  = %w[dog cat reptile bird other].freeze

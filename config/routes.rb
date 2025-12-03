@@ -8,5 +8,16 @@ Rails.application.routes.draw do
   end
 
   resources :animals, only: [:show, :edit, :update]
+
+  resources :transfers, only: [:create] do
+    member do
+      patch :accept
+      patch :reject
+      patch :mark_in_transit
+      patch :mark_received
+      patch :cancel
+    end
+  end
+
   root "home#index"
 end

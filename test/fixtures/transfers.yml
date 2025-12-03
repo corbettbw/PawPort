@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  animal: one
+  from_shelter_id: 1
+  to_shelter_id: 1
+  status: MyString
+  requested_at: 2025-12-01 15:46:30
+  accepted_at: 2025-12-01 15:46:30
+  rejected_at: 2025-12-01 15:46:30
+  departed_at: 2025-12-01 15:46:30
+  arrived_at: 2025-12-01 15:46:30
+  notes: MyText
+
+two:
+  animal: two
+  from_shelter_id: 1
+  to_shelter_id: 1
+  status: MyString
+  requested_at: 2025-12-01 15:46:30
+  accepted_at: 2025-12-01 15:46:30
+  rejected_at: 2025-12-01 15:46:30
+  departed_at: 2025-12-01 15:46:30
+  arrived_at: 2025-12-01 15:46:30
+  notes: MyText
