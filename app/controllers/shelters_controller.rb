@@ -17,6 +17,8 @@ class SheltersController < ApplicationController
     end
     @is_member = @membership.present?
 
+    @open_transfer_count = @shelter.outgoing_transfers.active.count + @shelter.incoming_transfers.active.count
+
     allowed_tabs = %w[home network transfers messages settings]
     @tab = params[:tab].presence_in(allowed_tabs) || "home"
 
