@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_27_045418) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_01_224630) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,6 +59,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_27_045418) do
     t.float "longitude"
   end
 
+  create_table "transfers", force: :cascade do |t|
+    t.bigint "animal_id", null: false
+    t.integer "from_shelter_id", null: false
+    t.integer "to_shelter_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "requested_at"
+    t.datetime "accepted_at"
+    t.datetime "rejected_at"
+    t.datetime "departed_at"
+    t.datetime "arrived_at"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["animal_id"], name: "index_transfers_on_animal_id"
+    t.index ["from_shelter_id"], name: "index_transfers_on_from_shelter_id"
+    t.index ["to_shelter_id"], name: "index_transfers_on_to_shelter_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -74,4 +92,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_27_045418) do
   add_foreign_key "animals", "shelters", column: "home_shelter_id"
   add_foreign_key "memberships", "shelters"
   add_foreign_key "memberships", "users"
+  add_foreign_key "transfers", "animals"
+  add_foreign_key "transfers", "shelters", column: "from_shelter_id"
+  add_foreign_key "transfers", "shelters", column: "to_shelter_id"
 end

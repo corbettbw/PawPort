@@ -33,7 +33,17 @@
                   (active ? "bg-white shadow-sm text-slate-900 font-medium" :
                             "text-slate-600 hover:bg-slate-200")
                 ].join(" ") do %>
-      <%= label %>
+
+      <div class="flex items-center gap-2">
+        <span><%= label %></span>
+
+        <% if key == 'transfers' && @open_transfer_count.to_i > 0 %>
+          <span class="ml-auto pill-base chip-info text-[0.65rem] px-2 min-w-[1.25rem] justify-center">
+            <%= @open_transfer_count %>
+          </span>
+        <% end %>
+      </div>
+
     <% end %>
   <% end %>
 </nav>

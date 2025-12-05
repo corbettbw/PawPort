@@ -5,14 +5,53 @@
     @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors cursor-pointer;
   }
 
-  /* remove @apply btn ... ; inline the same utilities */
+  /* primary / secondary buttons (keep using these for big CTAs etc.) */
   .btn-primary {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors
-           bg-rose-600 text-white hover:bg-rose-700;
+           bg-rose-600 text-white hover:bg-rose-700 cursor-pointer;
   }
+
   .btn-secondary {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors
            bg-gray-200 text-gray-800 hover:bg-gray-300;
+  }
+
+  /* === NEW: pill-style buttons / status chips for Transfers UI === */
+
+  /* base pill shape */
+  .pill-base {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-medium;
+  }
+
+  /* add pointer cursor for clickable pills */
+  .pill-clickable {
+    @apply cursor-pointer;
+  }
+
+  /* pill variants (for <button_to> etc.) */
+  .pill-primary {
+    @apply bg-rose-600 text-white hover:bg-rose-700;
+  }
+
+  .pill-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-700;
+  }
+
+  .pill-info {
+    @apply bg-sky-600 text-white hover:bg-sky-700;
+  }
+
+  .pill-outline {
+    @apply border border-slate-200 text-slate-700 hover:bg-slate-50;
+  }
+
+  /* non-clickable status chips */
+  .chip-info {
+    @apply bg-sky-50 text-sky-700;
+  }
+
+  .chip-warning {
+    @apply bg-amber-50 text-amber-700;
   }
 }
 
@@ -25,11 +64,20 @@
     @apply block w-full rounded-lg border border-gray-300 px-3 py-2
            focus:outline-none focus:ring-2 focus:ring-rose-500;
   }
-  label { @apply block text-sm font-medium text-gray-700; }
+
+  label {
+    @apply block text-sm font-medium text-gray-700;
+  }
 }
 
 /* animation helper */
 @layer utilities {
-  @keyframes fade-in { from { opacity:0; transform:translateY(-5px) } to { opacity:1; transform:none } }
-  .animate-fade-in { animation: fade-in .25s ease-out }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .animate-fade-in {
+    animation: fade-in .25s ease-out;
+  }
 }

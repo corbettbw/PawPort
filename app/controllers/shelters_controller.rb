@@ -3,27 +3,30 @@ class SheltersController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @shelters = current_user.shelters.order(created_at: :desc)
-
-    # Until we wire up associations, show the user’s shelters if the
-    # association exists; otherwise show none and a clear call-to-action.
-    @shelters = current_user.shelters.includes(:memberships, :users).order(created_at: :desc)
+    # list shelters current_user belongs to
+    @shelters = current_user.shelters
+                            .includes(:memberships, :users)
+                            .order(created_at: :desc)
   end
 
   def show
-    @shelter = Shelter.find(params[:id])
+    # @shelter set by before_action
 
     if current_user
       @membership = current_user.memberships.find_by(shelter: @shelter)
     end
-
     @is_member = @membership.present?
-    
-    allowed_tabs = %w[home network transfers messages settings]
-    @tab = params[:tab].presence_in(allowed_tabs) || 'home'
 
-    if @tab == "network"
+    @open_transfer_count = @shelter.outgoing_transfers.active.count + @shelter.incoming_transfers.active.count
+
+    allowed_tabs = %w[home network transfers messages settings]
+    @tab = params[:tab].presence_in(allowed_tabs) || "home"
+
+    case @tab
+    when "network"
       load_network_shelters
+    when "transfers"
+      load_transfers_tab
     end
   end
 
@@ -41,13 +44,12 @@ class SheltersController < ApplicationController
         .sub(phone.to_s, '')
         .squish.presence
 
-      @shelter.name         ||= name_guess
+      @shelter.name          ||= name_guess
       @shelter.contact_email ||= email
-      @shelter.phone        ||= phone
-      @shelter.address      ||= q if q.include?(',') # crude hint for addresses
+      @shelter.phone         ||= phone
+      @shelter.address       ||= q if q.include?(',') # crude hint for addresses
     end
   end
-
 
   def create
     @shelter = Shelter.new(shelter_params)
@@ -75,7 +77,6 @@ class SheltersController < ApplicationController
     redirect_to shelters_path, notice: "Shelter deleted."
   end
 
-
   def browse
     @q = params[:q].to_s.strip
     @shelters = Shelter.search(@q).order(:name)
@@ -89,19 +90,19 @@ class SheltersController < ApplicationController
       m.status = "active"
     end
     redirect_to shelters_path, notice: "Joined #{shelter.name}."
-    rescue ActiveRecord::RecordInvalid => e
-      redirect_to browse_shelters_path(q: params[:q]), alert: e.record.errors.full_messages.to_sentence
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to browse_shelters_path(q: params[:q]), alert: e.record.errors.full_messages.to_sentence
   end
-  
+
   def leave
-    shelter     = Shelter.find(params[:id])
-    membership  = current_user.memberships.find_by!(shelter_id: shelter.id)
+    shelter    = Shelter.find(params[:id])
+    membership = current_user.memberships.find_by!(shelter_id: shelter.id)
     membership.destroy
     redirect_to shelters_path, notice: "Left #{shelter.name}."
   end
 
-
   private
+
   def load_network_shelters
     scope = Shelter.where.not(id: @shelter.id)
 
@@ -114,15 +115,14 @@ class SheltersController < ApplicationController
     @network_shelters = shelters.sort_by do |s|
       case params[:sort]
       when "distance"
-        # geocoder's distance_to: returns distance in miles by default
         if s.latitude && s.longitude && @shelter.latitude && @shelter.longitude
           s.distance_to(@shelter)
         else
           Float::INFINITY
         end
-      when 'vacancy'
+      when "vacancy"
         -s.total_available          # higher vacancies first
-      when 'capacity'
+      when "capacity"
         -s.total_capacity           # higher capacity first
       else
         s.name                      # fallback: alphabetical
@@ -130,18 +130,44 @@ class SheltersController < ApplicationController
     end
   end
 
+  def load_transfers_tab
+    # Animals at this shelter that can be sent
+    @transfer_animals = @shelter.animals
+                                .where(status: "in_shelter")
+                                .where.not(
+                                  id: Transfer.active.select(:animal_id)
+                                )
+                                .order(:name)
+
+    # Possible destinations (all other shelters)
+    @transfer_targets = Shelter.where.not(id: @shelter.id)
+                               .order(:name)
+
+    # Transfers where this shelter is the origin
+    @outgoing_transfers = @shelter.outgoing_transfers
+                                  .active
+                                  .includes(:animal, :to_shelter)
+                                  .order(created_at: :desc)
+
+    # Transfers where this shelter is the destination
+    @incoming_transfers = @shelter.incoming_transfers
+                                  .active
+                                  .includes(:animal, :from_shelter)
+                                  .order(created_at: :desc)
+  end
+
   def set_shelter
     @shelter = Shelter.find(params[:id])
   end
 
   def shelter_params
-      params.require(:shelter).permit(
-        :name,
-        :address,
-        :phone,
-        :contact_email,
-        :capacity,
-        :vacancies
-      )
+    params.require(:shelter).permit(
+      :name,
+      :address,
+      :phone,
+      :contact_email,
+      :capacity,
+      :vacancies
+    )
   end
 end

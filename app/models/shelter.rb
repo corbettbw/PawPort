@@ -5,6 +5,16 @@ class Shelter < ApplicationRecord
     has_many :animals,
         foreign_key: :home_shelter_id,
         dependent: :nullify
+
+    has_many :outgoing_transfers,
+           class_name: "Transfer",
+           foreign_key: :from_shelter_id,
+           dependent: :nullify
+
+    has_many :incoming_transfers,
+           class_name: "Transfer",
+           foreign_key: :to_shelter_id,
+           dependent: :nullify
     # -------- Geocoding --------
     geocoded_by :address
 
@@ -44,6 +54,20 @@ class Shelter < ApplicationRecord
             q: "%#{q.downcase}%"
         ) : all
     }
+
+    def reserve_slot!
+        # Used when we want to commit to an incoming animal (B accepts transfer)
+        raise "No vacancies available to reserve" if vacancies.to_i <= 0
+        update!(vacancies: vacancies - 1)
+    end
+
+    def release_slot!
+      # Used when we free a spot (A no longer responsible for the animal)
+      # or when a reserved spot at B is released.
+      new_vacancies = vacancies.to_i + 1
+      raise "Vacancies would exceed capacity" if capacity && new_vacancies > capacity
+      update!(vacancies: new_vacancies)
+    end
 
     def total_capacity
         capacity.to_i

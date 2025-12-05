@@ -1,4 +1,167 @@
-<h2 class="text-lg font-semibold text-slate-900 mb-2">Transfers</h2>
-<p class="text-sm text-slate-600">
-  Incoming and outgoing transfer requests will eventually be managed here.
-</p>
+<!-- app/views/shelters/_transfers.html.erb -->
+
+<!-- Start a new transfer -->
+<div class="mt-6 bg-white rounded-2xl shadow-sm p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-slate-900">Start a new transfer</h2>
+    <p class="text-xs text-slate-500">
+      Choose an animal from this shelter and a destination shelter to send a request.
+    </p>
+  </div>
+
+  <% if @transfer_animals.any? && @transfer_targets.any? %>
+    <%= form_with url: transfers_path,
+                  scope: :transfer,
+                  method: :post,
+                  local: true do |f| %>
+
+      <%= hidden_field_tag :from_shelter_id, @shelter.id %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :animal_id, "Animal" %>
+          <%= f.select :animal_id,
+                       options_from_collection_for_select(@transfer_animals, :id, :name),
+                       { prompt: "Select an animal" },
+                       class: "mt-1 text-sm" %>
+        </div>
+
+        <div>
+          <%= f.label :to_shelter_id, "Destination shelter" %>
+          <%= f.select :to_shelter_id,
+                       options_from_collection_for_select(@transfer_targets, :id, :name),
+                       { prompt: "Select a shelter" },
+                       class: "mt-1 text-sm" %>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <!-- use shared button style -->
+        <%= f.submit "Request transfer", class: "btn-primary rounded-xl" %>
+
+      </div>
+    <% end %>
+  <% else %>
+    <p class="text-sm text-slate-500">
+      <% if @transfer_animals.empty? %>
+        No animals at this shelter are currently eligible for transfer.
+      <% elsif @transfer_targets.empty? %>
+        No other shelters are available as destinations yet.
+      <% end %>
+    </p>
+  <% end %>
+</div>
+
+<!-- Outgoing / Incoming lists -->
+<div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Outgoing -->
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="text-base font-semibold text-slate-900 mb-4">Outgoing transfers</h2>
+
+    <% if @outgoing_transfers.any? %>
+      <ul class="space-y-3">
+        <% @outgoing_transfers.each do |tr| %>
+          <li class="border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium text-slate-900"><%= tr.animal.name %></div>
+              <div class="text-xs text-slate-500">
+                To <%= tr.to_shelter.name %> · <%= tr.status.humanize %>
+              </div>
+            </div>
+
+            <div class="flex gap-2 text-xs">
+              <% if tr.pending? %>
+                <%= button_to "Cancel",
+                              cancel_transfer_path(tr),
+                              method: :patch,
+                              form: { data: { turbo_confirm: "Cancel this transfer request?" } },
+                              class: "pill-base pill-clickable pill-outline" %>
+
+              <% elsif tr.accepted? %>
+                <%= button_to "Mark in transit",
+                              mark_in_transit_transfer_path(tr),
+                              method: :patch,
+                              form: { data: { turbo_confirm: "Mark this animal as in transit?" } },
+                              class: "pill-base pill-clickable pill-info" %>
+
+                <%= button_to "Cancel",
+                              cancel_transfer_path(tr),
+                              method: :patch,
+                              form: { data: { turbo_confirm: "Cancel this transfer?" } },
+                              class: "pill-base pill-clickable pill-outline" %>
+
+              <% elsif tr.in_transit? %>
+                <span class="pill-base chip-warning">
+                  In transit
+                </span>
+
+                <%= button_to "Cancel",
+                              cancel_transfer_path(tr),
+                              method: :patch,
+                              form: { data: { turbo_confirm: "Cancel this transfer and keep the animal at this shelter?" } },
+                              class: "pill-base pill-clickable pill-outline" %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-slate-500">No outgoing transfers.</p>
+    <% end %>
+  </div>
+
+  <!-- Incoming -->
+  <div class="bg-white rounded-2xl shadow-sm p-6">
+    <h2 class="text-base font-semibold text-slate-900 mb-4">Incoming transfers</h2>
+
+    <% if @incoming_transfers.any? %>
+      <ul class="space-y-3">
+        <% @incoming_transfers.each do |tr| %>
+          <li class="border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium text-slate-900"><%= tr.animal.name %></div>
+              <div class="text-xs text-slate-500">
+                From <%= tr.from_shelter.name %> · <%= tr.status.humanize %>
+              </div>
+            </div>
+
+            <div class="flex gap-2 text-xs">
+              <% if tr.pending? %>
+                <%= button_to "Accept",
+                              accept_transfer_path(tr),
+                              method: :patch,
+                              class: "pill-base pill-clickable pill-success" %>
+
+                <%= button_to "Reject",
+                              reject_transfer_path(tr),
+                              method: :patch,
+                              form: { data: { turbo_confirm: "Reject this transfer?" } },
+                              class: "pill-base pill-clickable pill-outline" %>
+
+              <% elsif tr.accepted? %>
+                <span class="pill-base chip-info">
+                  Accepted · waiting for dispatch
+                </span>
+
+              <% elsif tr.in_transit? %>
+              <%= button_to "Mark received",
+                            mark_received_transfer_path(tr),
+                            method: :patch,
+                            class: "pill-base pill-clickable pill-success" %>
+
+              <%= button_to "Cancel",
+                            cancel_transfer_path(tr),
+                            method: :patch,
+                            form: { data: { turbo_confirm: "Cancel this transfer and keep the animal at the origin shelter?" } },
+                            class: "pill-base pill-clickable pill-outline" %>
+            <% end %>
+
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-slate-500">No incoming transfers.</p>
+    <% end %>
+  </div>
+</div>
