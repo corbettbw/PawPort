@@ -15,21 +15,21 @@ class TransfersController < ApplicationController
     @animal       = @from_shelter.animals.find(transfer_params[:animal_id])
     @to_shelter   = Shelter.find(transfer_params[:to_shelter_id])
 
-    # TODO: later add membership/role checks here
-
-    transfer = Transfer.create!(
-      animal:       @animal,
-      from_shelter: @from_shelter,
-      to_shelter:   @to_shelter,
-      status:       "pending",
-      requested_at: Time.current
+    @transfer = Transfer.new(
+        animal:       @animal,
+        from_shelter: @from_shelter,
+        to_shelter:   @to_shelter,
+        status:       "pending",
+        requested_at: Time.current
     )
 
-    redirect_to shelter_path(@from_shelter, tab: "transfers"),
-                notice: "Transfer request sent to #{@to_shelter.name}."
-  rescue ActiveRecord::RecordInvalid => e
-    redirect_to shelter_path(@from_shelter, tab: "transfers"),
-                alert: "Could not create transfer: #{e.record.errors.full_messages.to_sentence}"
+    if @transfer.save
+        redirect_to shelter_path(@from_shelter, tab: "transfers"),
+                    notice: "Transfer request sent to #{@to_shelter.name}."
+    else
+        redirect_to shelter_path(@from_shelter, tab: "transfers"),
+                    alert: "Could not create transfer: #{@transfer.errors.full_messages.to_sentence}"
+    end
   end
 
   # PATCH /transfers/:id/accept

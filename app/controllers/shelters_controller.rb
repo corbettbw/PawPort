@@ -134,6 +134,9 @@ class SheltersController < ApplicationController
     # Animals at this shelter that can be sent
     @transfer_animals = @shelter.animals
                                 .where(status: "in_shelter")
+                                .where.not(
+                                  id: Transfer.active.select(:animal_id)
+                                )
                                 .order(:name)
 
     # Possible destinations (all other shelters)
