@@ -41,6 +41,10 @@
           <span class="ml-auto pill-base chip-info text-[0.65rem] px-2 min-w-[1.25rem] justify-center">
             <%= @open_transfer_count %>
           </span>
+        <% elsif key == 'messages' && @unread_conversation_count.to_i > 0 %>
+          <span class="ml-auto pill-base chip-danger text-[0.65rem] px-2 min-w-[1.25rem] justify-center">
+            <%= @unread_conversation_count %>
+          </span>
         <% end %>
       </div>
 

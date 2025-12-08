@@ -19,5 +19,10 @@ Rails.application.routes.draw do
     end
   end
 
+
+  resources :conversations, only: [:show, :create, :destroy] do
+    resources :messages, only: [:create]
+  end
+
   root "home#index"
 end

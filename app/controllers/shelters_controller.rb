@@ -1,6 +1,8 @@
 class SheltersController < ApplicationController
   before_action :set_shelter, only: [:show, :edit, :update, :destroy, :leave]
   before_action :authenticate_user!
+  before_action :load_unread_conversation_count, only: :show
+
 
   def index
     # list shelters current_user belongs to
@@ -10,25 +12,38 @@ class SheltersController < ApplicationController
   end
 
   def show
-    # @shelter set by before_action
+  # @shelter set by before_action
 
-    if current_user
-      @membership = current_user.memberships.find_by(shelter: @shelter)
-    end
-    @is_member = @membership.present?
+  if current_user
+    @membership = current_user.memberships.find_by(shelter: @shelter)
+    @is_member  = @membership.present?
 
-    @open_transfer_count = @shelter.outgoing_transfers.active.count + @shelter.incoming_transfers.active.count
-
-    allowed_tabs = %w[home network transfers messages settings]
-    @tab = params[:tab].presence_in(allowed_tabs) || "home"
-
-    case @tab
-    when "network"
-      load_network_shelters
-    when "transfers"
-      load_transfers_tab
-    end
+    # compute unread message count for sidebar badge
+    load_unread_conversation_count
+  else
+    @membership = nil
+    @is_member  = false
+    @unread_conversation_count = 0
   end
+
+  @open_transfer_count =
+    @shelter.outgoing_transfers.active.count +
+    @shelter.incoming_transfers.active.count
+
+  allowed_tabs = %w[home network transfers messages settings]
+  @tab = params[:tab].presence_in(allowed_tabs) || "home"
+
+  case @tab
+  when "network"
+    load_network_shelters
+  when "transfers"
+    load_transfers_tab
+  when "messages"
+    load_messages_tab
+  end
+end
+
+
 
   def new
     @shelter = Shelter.new
@@ -102,6 +117,67 @@ class SheltersController < ApplicationController
   end
 
   private
+
+  def load_messages_tab
+  return unless current_user
+
+  @membership = current_user.memberships.find_by(shelter: @shelter)
+  @is_member  = @membership.present?
+
+  @conversations = Conversation
+                   .where("from_shelter_id = :id OR to_shelter_id = :id", id: @shelter.id)
+                   .includes(:from_shelter, :to_shelter, messages: :user)
+                   .order(last_message_at: :desc)
+
+  # form object for "Start a new conversation"
+  @conversation = Conversation.new(from_shelter: @shelter)
+
+  # shelters you can start a conversation with
+  @conversation_targets = Shelter.where.not(id: @shelter.id).order(:name)
+
+  # ---- select the current conversation ----
+  selected_id = params[:conversation_id].presence
+
+  @current_conversation =
+    if selected_id
+      @conversations.find { |c| c.id == selected_id.to_i }
+    else
+      @conversations.first
+    end
+
+  @messages =
+    if @current_conversation
+      @current_conversation.messages.sort_by(&:created_at)
+    else
+      []
+    end
+
+  # mark messages as "seen" now for this shelter (used for unread badge)
+  last_seen_map = session[:messages_last_seen_at] || {}
+  last_seen_map[@shelter.id.to_s] = Time.current
+  session[:messages_last_seen_at] = last_seen_map
+end
+
+def load_unread_conversation_count
+  return unless current_user
+
+  last_seen_map = session[:messages_last_seen_at] || {}
+  last_seen_at  = last_seen_map[@shelter.id.to_s]
+
+  scope = Conversation.where(
+    "from_shelter_id = :id OR to_shelter_id = :id",
+    id: @shelter.id
+  )
+
+  @unread_conversation_count =
+    if last_seen_at.present?
+      scope.where("last_message_at > ?", last_seen_at).count
+    else
+      scope.count
+    end
+end
+
+
 
   def load_network_shelters
     scope = Shelter.where.not(id: @shelter.id)
