@@ -15,6 +15,21 @@ class Shelter < ApplicationRecord
            class_name: "Transfer",
            foreign_key: :to_shelter_id,
            dependent: :nullify
+
+    has_many :outgoing_conversations,
+         class_name: "Conversation",
+         foreign_key: :from_shelter_id,
+         dependent: :nullify
+
+    has_many :incoming_conversations,
+            class_name: "Conversation",
+            foreign_key: :to_shelter_id,
+            dependent: :nullify
+
+    def conversations
+        Conversation.for_shelter(self)
+    end
+
     # -------- Geocoding --------
     geocoded_by :address
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_01_224630) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_08_204659) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,6 +35,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_224630) do
     t.index ["temperament_tags"], name: "index_animals_on_temperament_tags", using: :gin
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.string "subject"
+    t.bigint "from_shelter_id", null: false
+    t.bigint "to_shelter_id", null: false
+    t.bigint "initiator_id", null: false
+    t.datetime "last_message_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["from_shelter_id"], name: "index_conversations_on_from_shelter_id"
+    t.index ["initiator_id"], name: "index_conversations_on_initiator_id"
+    t.index ["to_shelter_id"], name: "index_conversations_on_to_shelter_id"
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "shelter_id", null: false
@@ -44,6 +57,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_224630) do
     t.datetime "updated_at", null: false
     t.index ["shelter_id"], name: "index_memberships_on_shelter_id"
     t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.bigint "user_id", null: false
+    t.text "body"
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
   create_table "shelters", force: :cascade do |t|
@@ -85,13 +109,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_224630) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "display_name"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "animals", "shelters", column: "home_shelter_id"
+  add_foreign_key "conversations", "shelters", column: "from_shelter_id"
+  add_foreign_key "conversations", "shelters", column: "to_shelter_id"
+  add_foreign_key "conversations", "users", column: "initiator_id"
   add_foreign_key "memberships", "shelters"
   add_foreign_key "memberships", "users"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "users"
   add_foreign_key "transfers", "animals"
   add_foreign_key "transfers", "shelters", column: "from_shelter_id"
   add_foreign_key "transfers", "shelters", column: "to_shelter_id"
